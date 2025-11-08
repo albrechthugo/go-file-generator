@@ -2,7 +2,8 @@ package main
 
 import (
 	"html/template"
-	"os"
+	"log"
+	"net/http"
 )
 
 type GitHubProfileData struct {
@@ -13,7 +14,7 @@ type GitHubProfileTemplateData struct {
 	Profile GitHubProfileData
 }
 
-func main() {
+func handler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("templates/gh-profile.html"))
 
 	var data = GitHubProfileTemplateData{
@@ -22,9 +23,10 @@ func main() {
 		},
 	}
 
-	err := tmpl.Execute(os.Stdout, data)
+	tmpl.Execute(w, data)
+}
 
-	if err != nil {
-		return
-	}
+func main() {
+	http.HandleFunc("/", handler)
+    log.Fatal(http.ListenAndServe(":8080", nil))
 }
